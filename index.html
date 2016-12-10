@@ -92,7 +92,7 @@
 					alert('Please write your City name');
 				}else{
 
-					var Google_API = 'https://maps.googleapis.com/maps/api/geocode/json?address='+location_value+'&sensor=true';
+					var Google_API = '//maps.googleapis.com/maps/api/geocode/json?address='+location_value+'&sensor=true';
 
 					$.getJSON(Google_API, function(json) {
 
@@ -116,7 +116,7 @@
 								id: 'marker1'
 							});
 
-							var Open_Weather_API = "http://api.openweathermap.org/data/2.5/weather?lat="+ lat +"&lon="+ lng +"&APPID=f299f4d63f5d93c9d0a811799a3f0cab";
+							var Open_Weather_API = "//api.openweathermap.org/data/2.5/weather?lat="+ lat +"&lon="+ lng +"&APPID=f299f4d63f5d93c9d0a811799a3f0cab";
 
 							$.getJSON(Open_Weather_API, function(data) {
 								if(data.cod == 200){
