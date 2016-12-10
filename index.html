@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<title>Google Map API</title>
+	
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	
+	<style>
+		html, body{ height: 100%; }
+		.margin-top{ margin-top: 2em; }
+		.form-group:last-child{ margin-bottom: 0; }
+		#google_map{ width: 100%; height: 400px; background-color: #e0e0e0; border: 1px solid #d6d6d6; box-shadow: 0 0 2px #fff inset; display: table; }
+		#google_map > .map-text{ display: table-cell; vertical-align: middle; text-align: center; font-size: 3em; color: white; text-shadow: 0px 0px 8px #000; }
+		#location_name{ display: none; padding-bottom: 10px; }
+		#location_name.show{ display: block; }
+		#location_preloader{ position: absolute; }
+	</style>
+
+</head>
+<body>
+	
+	<div class="container-fluid margin-top">
+		<div class="row">
+			
+			<div class="col-sm-3">
+				
+				<div class="well">
+					<legend>Write your location name</legend>
+					
+					<form action="#" method="GET" id="form_google_map" role="form" autocomplete="off">
+					
+						<div class="form-group">
+							<input type="text" name="location" class="form-control input-sm" placeholder="Write your location">
+							<span class="help-block"></span>
+						</div>
+						
+						<div class="form-group">
+							<button type="submit" class="btn btn-sm btn-block btn-primary">Get Map</button>
+						</div>
+
+					</form>
+				</div>
+
+			</div>
+
+			<div class="col-sm-9">
+				
+				<legend id="location_name"></legend>
+
+				<div class="well well-sm">
+					<div id="google_map">
+						<div class="map-text">Map will be load here</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- Jquery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+	<!-- Google Map API -->
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcV_xRRwutmKU96vtmZxk-CvXyf6YukaI" async defer></script>
+	
+	<!-- Google Map Plugin -->
+	<script type="text/javascript" src="js/jquery.googlemap.js"></script>
+	
+	<!-- Google MAP API Initialize -->
+	<script type="text/javascript">
+
+		$(function(){
+			
+			var form_google_map = $('#form_google_map');
+
+			form_google_map.submit(function(event) {
+				event.preventDefault();
+
+				var location_field = form_google_map.find('input[name="location"]');
+				var location_value = location_field.val();
+
+				var Google_API = 'https://maps.googleapis.com/maps/api/geocode/json?address='+location_value+'&sensor=true';
+
+				$.getJSON(Google_API, function(json) {
+
+					if(json.status == 'OK' && json.status !== 'ZERO_RESULTS'){
+						
+						var lat = json.results[0].geometry.location.lat,
+							lng = json.results[0].geometry.location.lng,
+							location_name = json.results[0].formatted_address;
+
+						$('#location_name').addClass('show').html(location_name);
+
+						$("#google_map").googleMap({
+							zoom: 12,
+							coords: [lat, lng],
+							type: "ROADMAP",
+							mapTypeControl: true
+						});
+
+						$("#google_map").addMarker({
+							url: 'http://www.coderpalace.com',
+							id: 'marker1'
+						});
+
+					}else{
+						alert('Invalid location found');
+					}
+
+				});
+
+			});
+
+		});
+	</script>
+
+</body>
+</html>
