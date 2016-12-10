@@ -56,6 +56,11 @@
 						<div class="map-text">Map will be load here</div>
 					</div>
 				</div>
+				
+				<div class="well well-sm">
+					<legend>Weather Information</legend>
+					<div id="weather_info"></div>
+				</div>
 
 			</div>
 		</div>
@@ -83,37 +88,86 @@
 				var location_field = form_google_map.find('input[name="location"]');
 				var location_value = location_field.val();
 
-				var Google_API = 'https://maps.googleapis.com/maps/api/geocode/json?address='+location_value+'&sensor=true';
+				if(location_value.length == 0){
+					alert('Please write your City name');
+				}else{
 
-				$.getJSON(Google_API, function(json) {
+					var Google_API = 'https://maps.googleapis.com/maps/api/geocode/json?address='+location_value+'&sensor=true';
 
-					if(json.status == 'OK' && json.status !== 'ZERO_RESULTS'){
-						
-						var lat = json.results[0].geometry.location.lat,
-							lng = json.results[0].geometry.location.lng,
-							location_name = json.results[0].formatted_address;
+					$.getJSON(Google_API, function(json) {
 
-						$('#location_name').addClass('show').html(location_name);
+						if(json.status == 'OK' && json.status !== 'ZERO_RESULTS'){
+							
+							var lat = json.results[0].geometry.location.lat,
+								lng = json.results[0].geometry.location.lng,
+								location_name = json.results[0].formatted_address;
 
-						$("#google_map").googleMap({
-							zoom: 12,
-							coords: [lat, lng],
-							type: "ROADMAP",
-							mapTypeControl: true
-						});
+							$('#location_name').addClass('show').html(location_name);
 
-						$("#google_map").addMarker({
-							url: 'http://www.coderpalace.com',
-							id: 'marker1'
-						});
+							$("#google_map").googleMap({
+								zoom: 8,
+								coords: [lat, lng],
+								type: "ROADMAP",
+								mapTypeControl: true
+							});
 
-					}else{
-						alert('Invalid location found');
-					}
+							$("#google_map").addMarker({
+								url: 'http://www.coderpalace.com',
+								id: 'marker1'
+							});
 
-				});
+							var Open_Weather_API = "http://api.openweathermap.org/data/2.5/weather?lat="+ lat +"&lon="+ lng +"&APPID=f299f4d63f5d93c9d0a811799a3f0cab";
+
+							$.getJSON(Open_Weather_API, function(data) {
+								if(data.cod == 200){
+									console.log(data);
+									load_weather_template('#weather_info', data);
+
+								}else{
+									alert(data.message);
+								}
+							});
+
+						}else{
+							alert('Invalid location found');
+						}
+
+					});
+				}
+
+
+				function load_weather_template(selector, data)
+				{
+					var weather_template = '<dl class="dl-horizontal">'+
+												'<dt>Country</dt>'+
+												'<dd>'+ data.sys.country +'</dd>'+
+												'<dt>Sunrise</dt>'+
+												'<dd>'+ data.sys.sunrise +'</dd>'+
+												'<dt>Sunset</dt>'+
+												'<dd>'+ data.sys.sunset +'</dd>'+
+												'<dt>Humidity</dt>'+
+												'<dd>'+ data.main.humidity +'</dd>'+
+												'<dt>Pressure</dt>'+
+												'<dd>'+ data.main.pressure +'</dd>'+
+												'<dt>Temp</dt>'+
+												'<dd>'+ data.main.temp +'</dd>'+
+												'<dt>Temp max</dt>'+
+												'<dd>'+ data.main.temp_max +'</dd>'+
+												'<dt>Temp min</dt>'+
+												'<dd>'+ data.main.temp_min +'</dd>'+
+												'<dt>Wind deg</dt>'+
+												'<dd>'+ data.wind.deg +'</dd>'+
+												'<dt>Wind speed</dt>'+
+												'<dd>'+ data.wind.speed +'</dd>'+
+											'</dl>';
+					$(selector).siblings('legend').html('Today is '+ data.weather[0].description);
+					$(selector).html(weather_template);
+
+				}
 
 			});
+
+			
 
 		});
 	</script>
